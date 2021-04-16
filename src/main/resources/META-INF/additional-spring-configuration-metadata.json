@@ -1,0 +1,28 @@
+{
+  "properties": [
+    {
+      "name": "farmacoSite",
+      "type": "java.lang.String",
+      "description": "Description for farmacoSite."
+    },
+    {
+      "name": "@value",
+      "type": "java.lang.String",
+      "description": "Description for @value."
+    },
+    {
+      "name": "spring.config.name.apotheek.site",
+      "type": "java.lang.String",
+      "description": "Description for spring.config.name.apotheek.site."
+    },
+    {
+      "name": "spring.config.name.apotheeksite",
+      "type": "java.lang.String",
+      "description": "Description for spring.config.name.apotheeksite."
+    },
+    {
+      "name": "apotheek.site",
+      "type": "java.lang.String",
+      "description": "Description for apotheek.site."
+    }
+  ] }
