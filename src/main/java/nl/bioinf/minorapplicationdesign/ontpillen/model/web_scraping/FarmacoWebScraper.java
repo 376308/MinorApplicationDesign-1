@@ -51,8 +51,11 @@ public class FarmacoWebScraper implements AbstractWebScraper {
             Elements h2Tags = doc.getElementsByTag("h2");
             List<String> sideEffects = h2Tags.select(":contains(Bijwerkingen)").nextAll().select("p").eachText();
             List<String> drugDescription = h2Tags.select(":contains(Advies)").nextAll().eachText();
+            List<String> Interactions = h2Tags.select(":contains(Interacties)").nextAll().eachText();
+
             System.out.println(sideEffects);
             System.out.println(drugDescription);
+            System.out.println(Interactions);
         }
 
     }
