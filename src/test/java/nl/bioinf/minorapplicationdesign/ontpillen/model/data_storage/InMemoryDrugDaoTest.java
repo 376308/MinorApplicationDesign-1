@@ -1,5 +1,6 @@
-package nl.bioinf.minorapplicationdesign.ontpillen.model.MedicineDAO;
+package nl.bioinf.minorapplicationdesign.ontpillen.model.data_storage;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
@@ -12,11 +13,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ComponentScan(basePackageClasses = {DrugDao.class})
 class InMemoryDrugDaoTest {
 
     @Autowired
     DrugDao drugDao;
+
+    @AfterEach
+    public void cleanUpTest() {
+        drugDao.removeAllDrugs();
+    }
 
     @Test
     void addDrug_addNewSubstance_returnNewDrugSubstance() {
@@ -61,6 +66,18 @@ class InMemoryDrugDaoTest {
     }
 
     @Test
+    void addDrug_nullValue_throwIllegalArgumentException() {
+        try {
+            DrugGroup newDrugGroup = new DrugGroup(null);
+            drugDao.addDrug(newDrugGroup);
+            fail();
+        }
+        catch (Exception exception) {
+            assertEquals("name can't be null", exception.getMessage());
+        }
+    }
+
+    @Test
     void getDrugByName_DrugInStorage_returnDrug() {
         DrugGroup newDrugGroup = new DrugGroup("Citalopram");
         drugDao.addDrug(newDrugGroup);
@@ -71,9 +88,20 @@ class InMemoryDrugDaoTest {
     void getDrugByName_DrugNotInStorage_throwIllegalArgumentException() {
         try {
             drugDao.getDrugByName("Nicotine");
+            fail();
         }
         catch(IllegalArgumentException exception){
             assertEquals("Nicotine does not exist.", exception.getMessage());
+        }
+    }
+
+    @Test
+    void getDrugByName_nullValue_throwIllegalArgumentException() {
+        try {
+            drugDao.getDrugByName(null);
+        }
+        catch (Exception exception){
+            assertEquals("null does not exist.", exception.getMessage());
         }
     }
 }

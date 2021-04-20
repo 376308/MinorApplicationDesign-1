@@ -1,4 +1,4 @@
-package nl.bioinf.minorapplicationdesign.ontpillen.model.MedicineDAO;
+package nl.bioinf.minorapplicationdesign.ontpillen.model.data_storage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,5 +55,11 @@ public class InMemoryDrugDao implements DrugDao {
 
     private boolean drugInDrugDao(Drug drug) throws IllegalArgumentException {
         return allDrugs.containsKey(drug.name);
+    }
+
+    public void removeAllDrugs() {
+        drugSubstances.clear();
+        mainDrugGroups.clear();
+        allDrugs.clear();
     }
 }

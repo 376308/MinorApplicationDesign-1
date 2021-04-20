@@ -1,4 +1,4 @@
-package nl.bioinf.minorapplicationdesign.ontpillen.model.MedicineDAO;
+package nl.bioinf.minorapplicationdesign.ontpillen.model.data_storage;
 
 import java.util.List;
 import java.util.Set;
@@ -45,4 +45,9 @@ public interface DrugDao {
      * @return List of all drug names
      */
     public List<String> getAllDrugNames();
+
+    /**
+     * Function that will remove all drugs in the Dao
+     */
+    public void removeAllDrugs();
 }
