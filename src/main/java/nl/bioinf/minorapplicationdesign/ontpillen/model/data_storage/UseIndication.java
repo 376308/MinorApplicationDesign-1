@@ -1,5 +1,14 @@
-package nl.bioinf.minorapplicationdesign.ontpillen.model.MedicineDAO;
+package nl.bioinf.minorapplicationdesign.ontpillen.model.data_storage;
+
+/**
+ *
+ * @author Larissa Bouwknegt
+ */
 
 public class UseIndication {
-    String name;
+    private String useIndication;
+
+    public void setUseIndication(String useIndication) {
+        this.useIndication = useIndication;
+    }
 }

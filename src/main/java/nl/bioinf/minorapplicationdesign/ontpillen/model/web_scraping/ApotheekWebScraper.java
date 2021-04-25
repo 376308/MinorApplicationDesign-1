@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -17,6 +18,9 @@ import java.util.List;
 @Component
 public class ApotheekWebScraper implements AbstractWebScraper {
     private DrugDao drugDao;
+    private String basicUrl;
+
+    private ApotheekWebScraper(@Value("${apotheek.site}") String url) {this.basicUrl = url;}
 
     @Autowired
     public void setDrugDao(DrugDao drugDao) {
@@ -102,8 +106,6 @@ public class ApotheekWebScraper implements AbstractWebScraper {
         if (medicine.contains("/")){
             medicine = medicine.replace("/", "-met-");
         }
-
-        String basicUrl = "https://www.apotheek.nl/medicijnen/";
         String completeUrl = basicUrl + medicine.toLowerCase();
         Document doc = Jsoup.connect(completeUrl).get();
         return doc;
