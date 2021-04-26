@@ -1,6 +1,7 @@
 package nl.bioinf.minorapplicationdesign.ontpillen.model.data_storage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -11,8 +12,9 @@ public class DrugSubstance extends Drug {
     private List<String> brandNames = new ArrayList<>();
     private List<String> description;
     private List<String> sideEffects;
-    private List<String> useIndications;
+    private List<UseIndication> useIndications = new ArrayList<>();
     private List<StopIndication>  stopIndications;
+    private List<String> interactions;
 
     public DrugSubstance(String name) {
         super(name);
@@ -30,8 +32,8 @@ public class DrugSubstance extends Drug {
         this.sideEffects = sideEffects;
     }
 
-    public void setUseIndications(List<String> useIndications){
-        this.useIndications = useIndications;
+    public void addUseIndication(UseIndication useIndication){
+        this.useIndications.add(useIndication);
     }
 
     public void setStopIndications(List<StopIndication> stopIndications){
@@ -47,22 +49,30 @@ public class DrugSubstance extends Drug {
     }
 
     public List<String> getBrandNames() {
-        return brandNames;
+        return Collections.unmodifiableList(brandNames);
     }
 
     public List<String> getDescription() {
-        return description;
+        return Collections.unmodifiableList(description);
     }
 
     public List<String> getSideEffects() {
-        return sideEffects;
+        return Collections.unmodifiableList(sideEffects);
     }
 
-    public List<String> getUseIndications() {
-        return useIndications;
+    public List<UseIndication> getUseIndications() {
+        return Collections.unmodifiableList(useIndications);
     }
 
     public List<StopIndication> getStopIndications() {
-        return stopIndications;
+        return Collections.unmodifiableList(stopIndications);
+    }
+
+    public List<String> getInteractions() {
+        return Collections.unmodifiableList(interactions);
+    }
+
+    public void setInteractions(List<String> interactions) {
+        this.interactions = interactions;
     }
 }

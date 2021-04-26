@@ -6,9 +6,11 @@ package nl.bioinf.minorapplicationdesign.ontpillen.model.data_storage;
  */
 
 public class UseIndication {
-    private String useIndication;
+    private String name;
 
-    public void setUseIndication(String useIndication) {
-        this.useIndication = useIndication;
+    public void setName(String useIndication) {
+        this.name = useIndication;
     }
+
+    public String getName() {return name;}
 }

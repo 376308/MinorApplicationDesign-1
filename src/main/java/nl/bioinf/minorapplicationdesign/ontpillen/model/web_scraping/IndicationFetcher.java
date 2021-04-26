@@ -2,6 +2,8 @@ package nl.bioinf.minorapplicationdesign.ontpillen.model.web_scraping;
 
 import nl.bioinf.minorapplicationdesign.ontpillen.model.data_storage.Drug;
 import nl.bioinf.minorapplicationdesign.ontpillen.model.data_storage.DrugDao;
+import nl.bioinf.minorapplicationdesign.ontpillen.model.data_storage.DrugSubstance;
+import nl.bioinf.minorapplicationdesign.ontpillen.model.data_storage.UseIndication;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,9 +14,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  *
@@ -26,7 +26,6 @@ import java.util.Locale;
 public class IndicationFetcher implements AbstractWebScraper{
     private DrugDao drugDao;
     private String url;
-    private List<String> drugs = new ArrayList<>();
 
     private IndicationFetcher(@Value("${farmaco.indication.site}") String url){this.url=url;}
 
@@ -40,27 +39,25 @@ public class IndicationFetcher implements AbstractWebScraper{
         SSLHelper.bypassSSL();
         Document doc = Jsoup.connect(url).get();
         Elements indicationHtmlElements = doc.getElementsByClass("pat-rich group-1").select("h2");
-        List<String> daoDrugs = drugDao.getAllDrugNames();
         for (Element indication: indicationHtmlElements) {
             String useIndication = indication.text();
             List<String> parsedDrugs = indication.nextElementSiblings().select("li").eachText();
-
-            drugs.addAll(parsedDrugs);
-            System.out.println("The indication is "+ useIndication + " the drugs are " + drugs);
+            checkDrugDao(parsedDrugs, indication.text());
+            System.out.println("The indication is "+ useIndication + " the drugs are " + parsedDrugs);
         }
-        checkDrugDao(daoDrugs);
-
     }
-    private void checkDrugDao(List<String> daoDrugs){
-        for (String drug: drugs) {
-            if (daoDrugs.contains(drug)) {
+    private void checkDrugDao(List<String> parsedDrugs, String indication){
+
+        for (String drug: parsedDrugs) {
+            if (drugDao.drugInDrugDao(drug)) {
                 Drug currentDrug = drugDao.getDrugByName(drug);
-                System.out.println(currentDrug.getName());
-
-
+                DrugSubstance drugsubstance = (DrugSubstance) currentDrug;
+                UseIndication newUseIndication = new UseIndication();
+                newUseIndication.setName(indication);
+                drugsubstance.addUseIndication(newUseIndication);
             }
             else {
-                System.out.println("drug not in drugdao");
+                System.out.println(drug + " not in drugdao");
             }
         }
     }
