@@ -57,6 +57,7 @@ public class IndicationFetcher implements AbstractWebScraper{
                 Drug currentDrug = drugDao.getDrugByName(drug);
                 System.out.println(currentDrug.getName());
 
+
             }
             else {
                 System.out.println("drug not in drugdao");
