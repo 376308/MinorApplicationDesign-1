@@ -10,6 +10,8 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
 public class ApotheekWebScraper implements AbstractWebScraper {
     private DrugDao drugDao;
     private String basicUrl;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApotheekWebScraper.class);
 
     private ApotheekWebScraper(@Value("${apotheek.site}") String url) {this.basicUrl = url;}
 
@@ -33,35 +36,31 @@ public class ApotheekWebScraper implements AbstractWebScraper {
 
     @Override
     public void parseHtml() throws IOException {
+        LOGGER.info("Parsing html");
         List<String> drugSubstances = new ArrayList<>();
         for(Drug drugSubstance : drugDao.getDrugSubstances()){
             drugSubstances.add(drugSubstance.getName());
         }
 
         for (String drug: drugSubstances) {
-
-            System.out.println("CURRENT DRUG IN THE LOOP: " +  drug);
             Document doc = getConnection(drug);
             getDescription(doc, drug);
-//            getSideEffects(doc);
-//            getInteractions(doc);
+            getSideEffects(doc);
+            getInteractions(doc);
 
-            // code to print the discrption in the Dao
+            // code to log the description of the Dao
             Drug drugSubstance = drugDao.getDrugByName(drug);
-            System.out.println("DISCRIPTION OF THE DRUG IN THE DAO: " + drug);
+            LOGGER.debug("Drug: " + drug);
             DrugSubstance drugSubstance1 = (DrugSubstance) drugSubstance;
-            System.out.println(drugSubstance1.getDescription());
-
+            LOGGER.debug("Description in the dao: " + drugSubstance1.getDescription());
+            LOGGER.debug("Interactions in the dao: " + drugSubstance1.getInteractions());
+            LOGGER.debug("SideEffects in the dao: " + drugSubstance1.getSideEffects());
         }
-
-
-
     }
 
-    private String getInteractions(Document doc) {
+    private void getInteractions(Document doc) {
         Elements interactions = doc.getElementsByAttributeValueContaining("data-print", "andere medicijnen gebruiken").select(".listItemContent_text__otIdg ");
-        System.out.println(interactions.eachText());
-        return null;
+        LOGGER.debug("Interactions: " + interactions.eachText());
     }
 
     private String getStopIndication() {
@@ -72,19 +71,17 @@ public class ApotheekWebScraper implements AbstractWebScraper {
 
         Elements sideEffectsHtmlLocation = doc.getElementsByAttributeValueContaining("data-print", "bijwerkingen");
         List<String> sideEffectsIntro = sideEffectsHtmlLocation.select(".listItemContent_text__otIdg p, p.listItemContent_text__otIdg").eachText();
-        System.out.println(sideEffectsIntro);
+        LOGGER.debug("side effects intro: " + sideEffectsIntro);
         Element frequencyAndSideEffect = sideEffectsHtmlLocation.select(".sideEffects_sideEffects__sczbd").get(0);
         Elements frequency = frequencyAndSideEffect.getElementsByTag("h3");
         for (Element element: frequency) {
             Elements sideEffects = element.nextElementSibling().getElementsByClass("sideEffectsItem_button__V-L1C");
-            System.out.println(element.text() + sideEffects.eachText());
+            LOGGER.debug("Chance of side effect: " + element.text() + sideEffects.eachText());
             for (Element sideEffect: sideEffects) {
                 Elements sideEffectDescription = sideEffect.nextElementSibling().select(".sideEffectsItem_content__10s1c");
-                System.out.println(sideEffect.text() + sideEffectDescription.eachText());
+                LOGGER.debug("side effects: " + sideEffect.text() + sideEffectDescription.eachText());
             }
         }
-
-
         //TODO Add to datamodel
         return null;
     }
