@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,18 +44,30 @@ public class ApotheekWebScraper implements AbstractWebScraper {
         }
 
         for (String drug: drugSubstances) {
+            Drug currentDrug = drugDao.getDrugByName(drug);
+            System.out.println(currentDrug.getName());
             Document doc = getConnection(drug);
+            List<String> alternativeHtmlPageDrugs = Arrays.asList(new String[]{"fluvoxamine", "mianserine",
+                    "imipramine", "acamprosaat", "nicotine", "buprenorfine (bij verslaving)", "methadon",
+                    "nitrazepam", "prazepam", "paliperidon", "sertindol", "penfluridol", "periciazine",
+                    "pimozide", "pipamperon"});
+            if (alternativeHtmlPageDrugs.contains(drug)){
+                getAlternativeHtmlSideEffects(doc, drug);
+            }
+//            else {
+//                getSideEffects(doc, drug);
+//            }
             getDescription(doc, drug);
-            getSideEffects(doc);
-            getInteractions(doc);
-
-            // code to log the description of the Dao
+//            getInteractions(doc);
+                // code to log the description of the Dao
             Drug drugSubstance = drugDao.getDrugByName(drug);
             LOGGER.debug("Drug: " + drug);
             DrugSubstance drugSubstance1 = (DrugSubstance) drugSubstance;
             LOGGER.debug("Description in the dao: " + drugSubstance1.getDescription());
-            LOGGER.debug("Interactions in the dao: " + drugSubstance1.getInteractions());
-            LOGGER.debug("SideEffects in the dao: " + drugSubstance1.getSideEffects());
+//            LOGGER.debug("Interactions in the dao: " + drugSubstance1.getInteractions());
+//            LOGGER.debug("SideEffects in the dao: " + drugSubstance1.getSideEffects());
+
+
         }
     }
 
@@ -67,8 +80,13 @@ public class ApotheekWebScraper implements AbstractWebScraper {
         return null;
     }
 
-    private String getSideEffects(Document doc) {
+    private void getAlternativeHtmlSideEffects(Document doc, String drug){
+        Elements sideEffectsHtmlLocation = doc.getElementsByAttributeValueContaining("data-print", "bijwerkingen");
+        System.out.println(sideEffectsHtmlLocation.select(".listItemContent_text__otIdg").select("p:not(p.strong)"));
 
+    }
+
+    private void getSideEffects(Document doc, String drug) {
         Elements sideEffectsHtmlLocation = doc.getElementsByAttributeValueContaining("data-print", "bijwerkingen");
         List<String> sideEffectsIntro = sideEffectsHtmlLocation.select(".listItemContent_text__otIdg p, p.listItemContent_text__otIdg").eachText();
         LOGGER.debug("side effects intro: " + sideEffectsIntro);
@@ -77,13 +95,13 @@ public class ApotheekWebScraper implements AbstractWebScraper {
         for (Element element: frequency) {
             Elements sideEffects = element.nextElementSibling().getElementsByClass("sideEffectsItem_button__V-L1C");
             LOGGER.debug("Chance of side effect: " + element.text() + sideEffects.eachText());
-            for (Element sideEffect: sideEffects) {
+            System.out.println(element.text() + sideEffects.eachText());
+            for (Element sideEffect : sideEffects) {
                 Elements sideEffectDescription = sideEffect.nextElementSibling().select(".sideEffectsItem_content__10s1c");
                 LOGGER.debug("side effects: " + sideEffect.text() + sideEffectDescription.eachText());
             }
         }
         //TODO Add to datamodel
-        return null;
     }
 
     private void getDescription(Document doc, String drug) {
@@ -100,8 +118,8 @@ public class ApotheekWebScraper implements AbstractWebScraper {
             medicine = "citalopram";
         }
         if (medicine.contains("(")){
+            // Regex to replace all between and including ()
             medicine = medicine.replaceAll("\\((.*?)\\)", "");
-            System.out.println("in if statement" +  medicine);
 
         }
         if (medicine.contains("/")){
