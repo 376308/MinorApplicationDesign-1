@@ -79,8 +79,6 @@ public class FarmacoWebScraper implements AbstractWebScraper {
             //≥ gets parsed as a ?, this is a problem with some drugs
             drugsubstance.setSideEffects(sideEffects);
             drugsubstance.setInteractions(interactions);
-            System.out.println(drugDescription);
-
 
             LOGGER.debug("Side effects for drug: " + medicine + " Side effects: " + sideEffects);
             LOGGER.debug("DrugDescription for drug: " + medicine + " Drug description: " + drugDescription);
